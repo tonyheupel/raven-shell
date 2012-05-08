@@ -23,9 +23,12 @@ Database.prototype.getCollections = function(cb) {
   })
 }
 
-Database.prototype.createDocument = function(doc, cb) {
-  console.log(doc)
-	request.put({ uri: this.getUrl() + '/docs/' + doc.id, json: doc }, function(error, response, body) {
+Database.prototype.save = function(collection, doc, cb) {
+	request.put({ 
+    headers: {'Raven-Entity-Name': collection}, 
+    uri: this.getUrl() + '/docs/' + doc.id, 
+    json: doc 
+    }, function(error, response, body) {
     console.log({'error': error, 'response': response, 'body': body})
 	  if (!error && response.statusCode == 200) {
 	    if (cb) cb(null, response)
