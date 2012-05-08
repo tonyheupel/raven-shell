@@ -1,0 +1,40 @@
+{
+  "name": "raven",
+  "preferGlobal": "true",
+  "version": "0.0.1",
+  "author": "Tony Heupel <tonyheupel@gmail.com>",
+  "description": "a command-line interface to RavenDB",
+  "contributors": [ 
+    {
+    } 
+  ],
+  "bin": {
+    "http-server": "./bin/http-server"
+  },
+  "scripts": {
+    "start": "node ./bin/http-server",
+    "test": "vows --spec --isolate"
+  },
+  "main": "./raven",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tchype/raven-cli.git"
+  },
+  "keywords": [
+    "cli",
+    "ravendb"  
+	],
+  "dependencies" : {
+	"request": "2.1.x"
+  },
+  "noAnalyze": true,
+  "devDependencies": {
+    "vows"    :  "0.5.x"
+  },
+  "bundleDependencies": [
+  ],
+  "license": "MIT",
+  "engine": {
+    "node": ">=0.6"
+  }
+}
