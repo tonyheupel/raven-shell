@@ -24,20 +24,17 @@ r.defineCommand('collections', {
   action: function() {
     try {
       r.context.db.getCollections(function(err, collections) { 
-        if (err) console.log(err)
+        if (err) console.error(err)
         else if (!collections) console.log("No collections found.")
         else {
           for(var i=0; i < collections.length; i++) {
-            r.outputStream.write(collections[i] + '\n')
+            console.log(collections[i])
           }
-//          collections.forEach(function(collection) {
-//            r.outputStream.write(collection + '\n')
-//          })
         }
         r.displayPrompt()
       })
     } catch (e) {
-      console.log(e)
+      console.error(e)
       r.displayPrompt()
     }
   }
