@@ -24,7 +24,8 @@ r.defineCommand('collections', {
   action: function() {
     try {
       r.context.db.getCollections(function(err, collections) { 
-        if (err) console.log(err) 
+        if (err) console.log(err)
+        else if (!collections) console.log("No collections found.")
         else {
           for(var i=0; i < collections.length; i++) {
             r.outputStream.write(collections[i] + '\n')
