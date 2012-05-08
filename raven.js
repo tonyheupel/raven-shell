@@ -25,18 +25,20 @@ Database.prototype.getCollections = function(cb) {
 
 Database.prototype.save = function(collection, doc, cb) {
 	request.put({ 
-    headers: {'Raven-Entity-Name': collection}, 
-    uri: this.getUrl() + '/docs/' + doc.id, 
+    headers: {'Raven-Entity-Name': collection}, // TODO: skip this if no collection string passed in?
+                                                // TODO: Add 'www-authenticate': 'NTLM' back into headers?
+    uri: this.getUrl() + '/docs/' + doc.id,     // TODO: Autogenerate id if not passed in?
     json: doc 
     }, function(error, response, body) {
-    console.log({'error': error, 'response': response, 'body': body})
-	  if (!error && response.statusCode == 200) {
+
+	  if (!error && response.statusCode == 201) { // 201 - Created
 	    if (cb) cb(null, response)
-      else console.log('No callback: ' + response)
 	  }
     else {
-      if (cb) cb(error)
-      else console.log('No callback: ' + response)
+      if (cb) {
+        if (error) cb(error)
+        else cb(new Error('Unable to create document: ' + response.statusCode + ' - ' + response.body))
+      }
     }
 	})
 }
