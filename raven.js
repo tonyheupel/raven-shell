@@ -32,7 +32,7 @@ Database.prototype.save = function(collection, doc, cb) {
     }, function(error, response, body) {
 
 	  if (!error && response.statusCode == 201) { // 201 - Created
-	    if (cb) cb(null, response)
+	    if (cb) cb(null, JSON.parse(body))
 	  }
     else {
       if (cb) {
@@ -43,6 +43,20 @@ Database.prototype.save = function(collection, doc, cb) {
 	})
 }
 
+Database.prototype.find = function(collection, doc, cb) {
+  var url = this.getUrl() + '/indexes/Raven/DocumentsByEntityName?query=Tag%253A' + collection + '&start=0&pageSize=0&aggregation=None'
+  request(url, function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      if (cb) cb(null, JSON.parse(body))
+    }
+    else {
+      if (cb) {
+        if (error) cb(error)
+        else cb(new Error('Error: ' + response.statusCode + ' - ' + body))
+      }
+    }
+  })
+}
 module.exports.use = function(url) {
   return new Datastore(url)
 }
