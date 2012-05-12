@@ -11,6 +11,8 @@ var Database = function(datastore, name) {
 }
 
 Database.prototype.getUrl = function() { return this.datastore.url }
+Database.prototype.getDocsUrl = function() { return this.getUrl() + '/docs/'}
+Database.prototype.getDocUrl = function(id) { return this.getDocsUrl() + id }
 
 Database.prototype.getCollections = function(cb) {
   request(this.getUrl() + '/terms/Raven/DocumentsByEntityName?field=Tag', function (error, response, body) {
@@ -27,7 +29,7 @@ Database.prototype.saveDocument = function(collection, doc, cb) {
   // If not id provided, use POST to allow server-generated id
   // else, use PUT and use id in url
   var op = request.post
-    , url = this.getUrl() + '/docs/'
+    , url = this.getDocsUrl()
 
   if (doc.id) {
     op = request.put
@@ -54,10 +56,26 @@ Database.prototype.saveDocument = function(collection, doc, cb) {
 }
 
 Database.prototype.getDocument = function(id, cb) {
-  var url = this.getUrl() + '/docs/' + id
+  var url = this.getDocUrl(id)
   this.apiGetCall(url, cb)
 }
 
+// PATCH - Update
+
+Database.prototype.deleteDocument = function(id, cb) {
+  var url = this.getDocUrl(id)
+
+  request.del(url, function(error, response, body) {
+    if (!error && response.statusCode == 204) {  // 204 - No content
+      if (cb) cb(null, (body && body.length > 0) ? JSON.parse(body) : null)
+    } else {
+      if (cb) {
+        if (error) cb(error)
+          else cb(new Error('Unable to delete document: ' + response.statusCode + ' - ' + response.body))
+      }
+    }
+  })
+}
 
 Database.prototype.find = function(doc, cb) {
   this.dynamicQuery(doc, 0, 100, function(error, results) {

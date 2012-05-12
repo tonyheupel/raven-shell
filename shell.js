@@ -42,8 +42,8 @@ r.defineCommand('collections', {
   }
 })
 
-r.defineCommand('savedoc', {
-	help: 'Save a document to a collection (e.g., .savedoc CollectionName { id: "users/tony", firstName: "Tony" })',
+r.defineCommand('create', {
+	help: 'Save a document to a collection (e.g., .create CollectionName { id: "users/tony", firstName: "Tony" })',
 	action: function(args) {
 		try {
 			var match = /(\w+)\s+(.*)/.exec(args)
@@ -68,7 +68,7 @@ r.defineCommand('savedoc', {
 	}
 })
 
-r.defineCommand('getdoc', {
+r.defineCommand('read', {
   help: 'Get a document given its id (e.g., .getdoc users/tony)',
   action: function(args) {
     try {
@@ -90,6 +90,28 @@ r.defineCommand('getdoc', {
   }
 })
 
+
+r.defineCommand('delete', {
+  help: 'Delete a document given its id (e.g., .delete users/tony)',
+  action: function(args) {
+    try {
+      if (!args) throw Error('Wrong number of arguments; see .help for more information')
+
+      var id = args
+      r.context.db.deleteDocument(id, function(error, result) {
+        if (error) console.error(error)
+        
+        if (result) console.log(result)
+        r.context._ = result
+        r.displayPrompt()
+      })
+      
+    } catch (e) {
+      console.error(e)
+      r.displayPrompt()
+    }
+  }
+})
 
 
 r.defineCommand('find', {
