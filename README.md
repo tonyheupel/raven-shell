@@ -16,7 +16,7 @@ Requirements
 
 Usage
 -----
-`shell
+```shell
 $ node shell
 RavenDB shell
 > .store http://someravendb.myorg.com:8080
@@ -96,4 +96,4 @@ undefined
 [Error: Error: 404 - ]
 > .exit
 $ 
-`
+```
