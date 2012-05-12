@@ -161,7 +161,7 @@ r.defineCommand('docs', {
 })
 
 r.defineCommand('count', {
-  help: 'Show the count of documents in a collection (or in the database if left blank/n(e.g., .count Users)',
+  help: 'Show the count of documents in a collection or in the database if left blank (e.g., .count Users)',
   action: function(args) {
     try {
       r.context.db.getDocumentCount(args, function(error, result) {
