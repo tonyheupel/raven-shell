@@ -60,3 +60,6 @@ Database.prototype.find = function(collection, doc, cb) {
 module.exports.use = function(url) {
   return new Datastore(url)
 }
+
+module.exports.Database = Database
+

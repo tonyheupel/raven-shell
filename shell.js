@@ -1,5 +1,8 @@
-var repl = require('repl'),
-    raven = require('./raven')
+var repl = require('repl')
+	, raven = require('./raven')
+	, Future = require('fibers/future')
+	, wait = Future.wait
+
 
 var useStore = function(url) {
   r.context.store = raven.use(url)
@@ -23,19 +26,22 @@ r.defineCommand('collections', {
   help: 'Show all collections in the current database',
   action: function() {
     try {
-      r.context.db.getCollections(function(err, collections) { 
-        if (err) console.error(err)
-        else if (!collections) console.log("No collections found.")
-        else {
-          for(var i=0; i < collections.length; i++) {
-            console.log(collections[i])
-          }
-        }
-        r.displayPrompt()
-      })
+		  var getCollections = Future.wrap(r.context.db.getCollections) 
+		  var c = Fiber(function() {
+		    var collections = getCollections.call(r.context.db).wait()
+      
+		    if (!collections) console.log("No collections found.")
+		    else {
+		      for(var i=0; i < collections.length; i++) {
+		        console.log(collections[i])
+		      }
+		    }
+				r.displayPrompt()
+		  }).run()
+			
     } catch (e) {
       console.error(e)
-      r.displayPrompt()
+	    r.displayPrompt()
     }
   }
 })

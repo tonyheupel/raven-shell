@@ -25,7 +25,8 @@
     "ravendb"  
 	],
   "dependencies" : {
-	"request": "2.1.x"
+	"request": "2.1.x",
+	"fibers": ">=0.6"
   },
   "noAnalyze": true,
   "devDependencies": {
