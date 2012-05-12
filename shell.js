@@ -53,7 +53,7 @@ r.defineCommand('savedoc', {
 			eval('var doc = ' + match[2])
 
 
-			r.context.db.save(collection, doc, function(error, result) {
+			r.context.db.saveDocument(collection, doc, function(error, result) {
 				if (error) console.error(error)
 				
 				if (result) console.log(result)
@@ -67,6 +67,29 @@ r.defineCommand('savedoc', {
 		}
 	}
 })
+
+r.defineCommand('getdoc', {
+  help: 'Get a document given its id (e.g., .getdoc users/tony)',
+  action: function(args) {
+    try {
+      if (!args) throw Error('Wrong number of arguments; see .help for more information')
+
+      var id = args
+      r.context.db.getDocument(id, function(error, result) {
+        if (error) console.error(error)
+        
+        if (result) console.log(result)
+        r.context._ = result
+        r.displayPrompt()
+      })
+      
+    } catch (e) {
+      console.error(e)
+      r.displayPrompt()
+    }
+  }
+})
+
 
 
 r.defineCommand('find', {
@@ -113,6 +136,24 @@ r.defineCommand('docs', {
         r.displayPrompt()
       })
       
+    } catch (e) {
+      console.error(e)
+      r.displayPrompt()
+    }
+  }
+})
+
+r.defineCommand('count', {
+  help: 'Show the count of documents in a collection (or in the database if left blank/n(e.g., .count Users)',
+  action: function(args) {
+    try {
+      r.context.db.getDocumentCount(args, function(error, result) {
+        if (error) console.error(error)
+
+        if (result) console.log(result)
+        r.context._ = result
+        r.displayPrompt()
+      })
     } catch (e) {
       console.error(e)
       r.displayPrompt()

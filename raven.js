@@ -23,7 +23,7 @@ Database.prototype.getCollections = function(cb) {
   })
 }
 
-Database.prototype.save = function(collection, doc, cb) {
+Database.prototype.saveDocument = function(collection, doc, cb) {
   // If not id provided, use POST to allow server-generated id
   // else, use PUT and use id in url
   var op = request.post
@@ -53,6 +53,12 @@ Database.prototype.save = function(collection, doc, cb) {
 	})
 }
 
+Database.prototype.getDocument = function(id, cb) {
+  var url = this.getUrl() + '/docs/' + id
+  this.apiGetCall(url, cb)
+}
+
+
 Database.prototype.find = function(doc, cb) {
   this.dynamicQuery(doc, 0, 100, function(error, results) {
     var matches = results && results.Results ? results.Results : null
@@ -67,7 +73,7 @@ Database.prototype.getDocsInCollection = function(collection, cb) {
 }
 
 Database.prototype.getDocumentCount = function(collection, cb) {
-  this.queryRavenDocumentsByEntityName(collection, null, 0, 0, function(error, results) {
+  this.queryRavenDocumentsByEntityName(collection, 0, 0, function(error, results) {
     cb(error, results.TotalResults)
   })
 }
@@ -87,7 +93,8 @@ Database.prototype.queryRavenDocumentsByEntityName = function(name, start, count
   // if start and count aren't passed in, you'll just get the TotalResults property
   // and no results
 
-  var url = this.getUrl() + '/indexes/Raven/DocumentsByEntityName?query=Tag:' + name + '&start=' + start + '&pageSize=' + count + '&aggregation=None'
+  var url = this.getUrl() + '/indexes/Raven/DocumentsByEntityName?start=' + start + '&pageSize=' + count + '&aggregation=None'
+  if (name && name.length > 0) url += '&query=Tag:' + name
   this.apiGetCall(url, cb)
 }
 
