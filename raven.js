@@ -24,10 +24,20 @@ Database.prototype.getCollections = function(cb) {
 }
 
 Database.prototype.save = function(collection, doc, cb) {
-	request.put({ 
+  // If not id provided, use POST to allow server-generated id
+  // else, use PUT and use id in url
+  var op = request.post
+    , url = this.getUrl() + '/docs/'
+
+  if (doc.id) {
+    op = request.put
+    url += doc.id
+  }
+
+	op({ 
     headers: {'Raven-Entity-Name': collection}, // TODO: skip this if no collection string passed in?
                                                 // TODO: Add 'www-authenticate': 'NTLM' back into headers?
-    uri: this.getUrl() + '/docs/' + doc.id,     // TODO: Autogenerate id if not passed in?
+    uri: url,    
     json: doc 
     }, function(error, response, body) {
 
@@ -43,8 +53,45 @@ Database.prototype.save = function(collection, doc, cb) {
 	})
 }
 
-Database.prototype.find = function(collection, doc, cb) {
-  var url = this.getUrl() + '/indexes/Raven/DocumentsByEntityName?query=Tag%253A' + collection + '&start=0&pageSize=0&aggregation=None'
+Database.prototype.find = function(doc, cb) {
+  this.dynamicQuery(doc, 0, 100, function(error, results) {
+    var matches = results && results.Results ? results.Results : null
+    cb(error, matches)
+  })
+}
+
+Database.prototype.getDocsInCollection = function(collection, cb) {
+  this.queryRavenDocumentsByEntityName(collection, 0, 100, function(error, results) {
+    cb(error, results.Results)
+  })
+}
+
+Database.prototype.getDocumentCount = function(collection, cb) {
+  this.queryRavenDocumentsByEntityName(collection, null, 0, 0, function(error, results) {
+    cb(error, results.TotalResults)
+  })
+}
+
+
+Database.prototype.dynamicQuery = function(doc, start, count, cb) {
+  var url = this.getUrl() + 'suggest/dynamic?query='
+  for (prop in doc) {
+    url += prop + ':' + doc[prop] + '+'
+  }
+  this.apiGetCall(url, cb)
+}
+
+Database.prototype.queryRavenDocumentsByEntityName = function(name, start, count, cb) {
+  if (!start) start = 0
+  if (!count) count = 0
+  // if start and count aren't passed in, you'll just get the TotalResults property
+  // and no results
+
+  var url = this.getUrl() + '/indexes/Raven/DocumentsByEntityName?query=Tag:' + name + '&start=' + start + '&pageSize=' + count + '&aggregation=None'
+  this.apiGetCall(url, cb)
+}
+
+Database.prototype.apiGetCall = function(url, cb) {
   request(url, function(error, response, body) {
     if (!error && response.statusCode == 200) {
       if (cb) cb(null, JSON.parse(body))
@@ -57,9 +104,10 @@ Database.prototype.find = function(collection, doc, cb) {
     }
   })
 }
-module.exports.use = function(url) {
+
+module.exports = { 
+  Database: Database,
+  use: function(url) {
   return new Datastore(url)
+  }
 }
-
-module.exports.Database = Database
-

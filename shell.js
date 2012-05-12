@@ -68,4 +68,56 @@ r.defineCommand('savedoc', {
 	}
 })
 
+
+r.defineCommand('find', {
+  help: 'Find documents (e.g., .find { firstName: "Tony" })',
+  action: function(args) {
+    try {
+      var match = /(\w+)(\s+(.*))?/.exec(args)
+      if (match.length < 2) throw Error('Wrong number of arguments; see .help for .savedoc usage')
+      
+      var collection = match[1]
+      var doc = null
+      if (match.length == 3) eval('doc = ' + match[2])
+
+
+      r.context.db.find(doc, function(error, result) {
+        if (error) console.error(error)
+        
+        if (result) console.log(result)
+        r.context._ = result
+        r.displayPrompt()
+      })
+      
+    } catch (e) {
+      console.error(e)
+      r.displayPrompt()
+    }
+  }
+})
+
+r.defineCommand('docs', {
+  help: 'Retrieve documents in a collection (e.g., .doc Users)',
+  action: function(args) {
+    try {
+      var match = /(\w+)/.exec(args)
+      if (match.length != 2) throw Error('Wrong number of arguments; see .help for .savedoc usage')
+      
+      var collection = match[1]
+
+      r.context.db.getDocsInCollection(collection, function(error, result) {
+        if (error) console.error(error)
+        
+        if (result) console.log(result)
+        r.context._ = result
+        r.displayPrompt()
+      })
+      
+    } catch (e) {
+      console.error(e)
+      r.displayPrompt()
+    }
+  }
+})
+
 useStore('http://localhost:8080')
