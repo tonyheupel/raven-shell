@@ -32,7 +32,7 @@ r.defineCommand('collections', {
 		        console.log(collections[i])
 		      }
 		    }
-				
+				r.context._ = collections
 				r.displayPrompt()
 		  })
     } catch (e) {
@@ -42,15 +42,22 @@ r.defineCommand('collections', {
   }
 })
 
-r.defineCommand('save', {
-	help: 'Save a document to a collection (e.g., .save CollectionName { id: "users/tony", firstName: "Tony" })',
-	action: function(collection, doc) {
-		console.log("collection: " + collection)
+r.defineCommand('savedoc', {
+	help: 'Save a document to a collection (e.g., .savedoc CollectionName { id: "users/tony", firstName: "Tony" })',
+	action: function(args) {
 		try {
+			var match = /(\w+)\s+(.*)/.exec(args)
+			if (match.length != 3) throw Error('Wrong number of arguments; see .help for .savedoc usage')
+			
+			var collection = match[1]
+			eval('var doc = ' + match[2])
+
+
 			r.context.db.save(collection, doc, function(error, result) {
-				if (error) throw error
+				if (error) console.error(error)
 				
 				if (result) console.log(result)
+				r.context._ = result
 				r.displayPrompt()
 			})
 			

@@ -32,7 +32,7 @@ Database.prototype.save = function(collection, doc, cb) {
     }, function(error, response, body) {
 
 	  if (!error && response.statusCode == 201) { // 201 - Created
-	    if (cb) cb(null, JSON.parse(body))
+	    if (cb) cb(null, body)
 	  }
     else {
       if (cb) {
