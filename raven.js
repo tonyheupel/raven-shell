@@ -11,11 +11,19 @@ var Database = function(datastore, name) {
 }
 
 Database.prototype.getUrl = function() { return this.datastore.url }
-Database.prototype.getDocsUrl = function() { return this.getUrl() + '/docs/'}
+Database.prototype.getDocsUrl = function() { return this.getUrl() + '/docs/' }
 Database.prototype.getDocUrl = function(id) { return this.getDocsUrl() + id }
+Database.prototype.getIndexesUrl = function() { return this.getUrl() + '/indexes/' }
+Database.prototype.getIndexUrl = function(index) { return this.getIndexesUrl() + index + '?' }
+Database.prototype.getTermsUrl = function(index, field) { 
+  return this.getUrl() + '/terms/' + index + '?field=' + field
+}
+Database.DOCUMENTS_BY_ENTITY_NAME_INDEX = 'Raven/DocumentsByEntityName'
+Database.DYNAMIC_INDEX = 'dynamic'
+
 
 Database.prototype.getCollections = function(cb) {
-  request(this.getUrl() + '/terms/Raven/DocumentsByEntityName?field=Tag', function (error, response, body) {
+  request(this.getTermsUrl(Database.DOCUMENTS_BY_ENTITY_NAME_INDEX, 'Tag'), function (error, response, body) {
     if (!error && response.statusCode == 200) {
       if (cb) cb(null, JSON.parse(body))
     }
@@ -98,7 +106,8 @@ Database.prototype.getDocumentCount = function(collection, cb) {
 
 
 Database.prototype.dynamicQuery = function(doc, start, count, cb) {
-  var url = this.getUrl() + 'suggest/dynamic?query='
+  console.log(doc)
+  var url = this.getIndexUrl(Database.DYNAMIC_INDEX) + 'start=' + start + '&pageSize=' + count + '&aggregation=None&query='
   for (prop in doc) {
     url += prop + ':' + doc[prop] + '+'
   }
@@ -111,7 +120,7 @@ Database.prototype.queryRavenDocumentsByEntityName = function(name, start, count
   // if start and count aren't passed in, you'll just get the TotalResults property
   // and no results
 
-  var url = this.getUrl() + '/indexes/Raven/DocumentsByEntityName?start=' + start + '&pageSize=' + count + '&aggregation=None'
+  var url = this.getIndexUrl(Database.DOCUMENTS_BY_ENTITY_NAME_INDEX) + 'start=' + start + '&pageSize=' + count + '&aggregation=None'
   if (name && name.length > 0) url += '&query=Tag:' + name
   this.apiGetCall(url, cb)
 }

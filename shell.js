@@ -69,7 +69,7 @@ r.defineCommand('create', {
 })
 
 r.defineCommand('read', {
-  help: 'Get a document given its id (e.g., .getdoc users/tony)',
+  help: 'Get a document given its id (e.g., .read users/tony)',
   action: function(args) {
     try {
       if (!args) throw Error('Wrong number of arguments; see .help for more information')
@@ -118,15 +118,11 @@ r.defineCommand('find', {
   help: 'Find documents (e.g., .find { firstName: "Tony" })',
   action: function(args) {
     try {
-      var match = /(\w+)(\s+(.*))?/.exec(args)
-      if (match.length < 2) throw Error('Wrong number of arguments; see .help for .savedoc usage')
+      if (!args) throw Error('Wrong number of arguments; see .help for .find usage')
       
-      var collection = match[1]
-      var doc = null
-      if (match.length == 3) eval('doc = ' + match[2])
+      eval('var argsDoc = ' + args)
 
-
-      r.context.db.find(doc, function(error, result) {
+      r.context.db.find(argsDoc, function(error, result) {
         if (error) console.error(error)
         
         if (result) console.log(result)
@@ -146,9 +142,8 @@ r.defineCommand('docs', {
   action: function(args) {
     try {
       var match = /(\w+)/.exec(args)
-      if (match.length != 2) throw Error('Wrong number of arguments; see .help for .savedoc usage')
       
-      var collection = match[1]
+      var collection = (match && match.length == 2) ? match[1] : null
 
       r.context.db.getDocsInCollection(collection, function(error, result) {
         if (error) console.error(error)
