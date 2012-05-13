@@ -12,7 +12,7 @@
     "raven": "shell.js"
   },
   "scripts": {
-    "start": "raven",
+    "start": "raven"
   },
   "main": "./shell",
   "repository": {
