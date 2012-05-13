@@ -13,7 +13,9 @@ var r = repl.start("> ")
 r.defineCommand('store', {
 	help: 'Use the RavenDB datastore at a url ".store <url>"',
   action: function(url) {
-    useStore(url)
+    if (!url) url = r.context.db.getUrl()
+    else useStore(url)
+    
     console.log('Using datastore at: ' + url)
     r.displayPrompt()
   }

@@ -19,6 +19,8 @@ Usage
 ```shell
 $ node shell
 RavenDB shell
+> .store
+Using datastore at: http://localhost:8080
 > .store http://someravendb.myorg.com:8080
 Using datastore at: http://someravendb.myorg.com:8080
 > .count Albums
