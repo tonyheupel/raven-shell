@@ -17,7 +17,7 @@ Requirements
 Usage
 -----
 ```shell
-$ node shell
+$ raven      (if "raven" doesn't work, try "node shell")
 RavenDB shell
 > .store
 Using datastore at: http://localhost:8080
