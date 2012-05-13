@@ -9,11 +9,10 @@
     } 
   ],
   "bin": {
-    "raven": "raven"
+    "raven": "shell.js"
   },
   "scripts": {
     "start": "raven",
-    "test": "vows --spec --isolate"
   },
   "main": "./shell",
   "repository": {
@@ -29,7 +28,6 @@
   },
   "noAnalyze": true,
   "devDependencies": {
-    "vows"    :  "0.5.x"
   },
   "bundleDependencies": [
   ],

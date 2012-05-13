@@ -1,5 +1,7 @@
+#!/usr/bin/env node
+
 var repl = require('repl')
-	, ravendb = require('ravendb')
+  , ravendb = require('ravendb')
 
 var useStore = function(url) {
   r.context.store = ravendb.use(url)
@@ -11,7 +13,7 @@ console.log('RavenDB shell')
 var r = repl.start("> ")
 
 r.defineCommand('store', {
-	help: 'Use the RavenDB datastore at a url ".store <url>"',
+  help: 'Use the RavenDB datastore at a url ".store <url>"',
   action: function(url) {
     if (!url) url = r.context.db.getUrl()
     else useStore(url)
