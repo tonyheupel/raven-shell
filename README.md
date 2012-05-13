@@ -17,7 +17,9 @@ Requirements
 Usage
 -----
 ```shell
-$ raven      (if "raven" doesn't work, try "node shell")
+$ npm install raven-shell -g
+...
+$ raven
 RavenDB shell
 > .store
 Using datastore at: http://localhost:8080
