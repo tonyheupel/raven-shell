@@ -1,8 +1,8 @@
 var repl = require('repl')
-	, raven = require('./raven')
+	, ravendb = require('ravendb')
 
 var useStore = function(url) {
-  r.context.store = raven.use(url)
+  r.context.store = ravendb.use(url)
   r.context.db = r.context.store.defaultDb
 }
 
