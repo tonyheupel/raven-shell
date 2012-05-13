@@ -17,7 +17,7 @@ r.defineCommand('store', {
   action: function(url) {
     if (!url) url = r.context.db.getUrl()
     else useStore(url)
-    
+
     console.log('Using datastore at: ' + url)
     r.displayPrompt()
   }
@@ -28,20 +28,24 @@ r.defineCommand('collections', {
   action: function() {
     try {
 			r.context.db.getCollections(function(error, collections) {
-      	if (error) throw error
-				
-		    if (!collections) console.log("No collections found.")
-		    else {
-		      for(var i=0; i < collections.length; i++) {
-		        console.log(collections[i])
-		      }
-		    }
-				r.context._ = collections
-				r.displayPrompt()
-		  })
+        if (error) {
+          console.error(error)
+          r.displayPrompt()
+          return
+        }
+
+        if (!collections) console.log("No collections found.")
+        else {
+          for(var i=0; i < collections.length; i++) {
+            console.log(collections[i])
+          }
+        }
+        r.context._ = collections
+        r.displayPrompt()
+      })
     } catch (e) {
       console.error(e)
-	    r.displayPrompt()
+      r.displayPrompt()
     }
   }
 })
@@ -52,19 +56,19 @@ r.defineCommand('create', {
 		try {
 			var match = /(\w+)\s+(.*)/.exec(args)
 			if (match.length != 3) throw Error('Wrong number of arguments; see .help for .savedoc usage')
-			
+
 			var collection = match[1]
 			eval('var doc = ' + match[2])
 
 
 			r.context.db.saveDocument(collection, doc, function(error, result) {
 				if (error) console.error(error)
-				
+
 				if (result) console.log(result)
 				r.context._ = result
 				r.displayPrompt()
 			})
-			
+
 		} catch (e) {
 			console.error(e)
 			r.displayPrompt()
@@ -81,12 +85,12 @@ r.defineCommand('read', {
       var id = args
       r.context.db.getDocument(id, function(error, result) {
         if (error) console.error(error)
-        
+
         if (result) console.log(result)
         r.context._ = result
         r.displayPrompt()
       })
-      
+
     } catch (e) {
       console.error(e)
       r.displayPrompt()
@@ -104,12 +108,12 @@ r.defineCommand('delete', {
       var id = args
       r.context.db.deleteDocument(id, function(error, result) {
         if (error) console.error(error)
-        
+
         if (result) console.log(result)
         r.context._ = result
         r.displayPrompt()
       })
-      
+
     } catch (e) {
       console.error(e)
       r.displayPrompt()
@@ -123,17 +127,17 @@ r.defineCommand('find', {
   action: function(args) {
     try {
       if (!args) throw Error('Wrong number of arguments; see .help for .find usage')
-      
+
       eval('var argsDoc = ' + args)
 
       r.context.db.find(argsDoc, function(error, result) {
         if (error) console.error(error)
-        
+
         if (result) console.log(result)
         r.context._ = result
         r.displayPrompt()
       })
-      
+
     } catch (e) {
       console.error(e)
       r.displayPrompt()
@@ -146,17 +150,17 @@ r.defineCommand('docs', {
   action: function(args) {
     try {
       var match = /(\w+)/.exec(args)
-      
+
       var collection = (match && match.length == 2) ? match[1] : null
 
       r.context.db.getDocsInCollection(collection, function(error, result) {
         if (error) console.error(error)
-        
+
         if (result) console.log(result)
         r.context._ = result
         r.displayPrompt()
       })
-      
+
     } catch (e) {
       console.error(e)
       r.displayPrompt()
