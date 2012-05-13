@@ -11,10 +11,10 @@ var Database = function(datastore, name) {
 }
 
 Database.prototype.getUrl = function() { return this.datastore.url }
-Database.prototype.getDocsUrl = function() { return this.getUrl() + '/docs/' }
-Database.prototype.getDocUrl = function(id) { return this.getDocsUrl() + id }
-Database.prototype.getIndexesUrl = function() { return this.getUrl() + '/indexes/' }
-Database.prototype.getIndexUrl = function(index) { return this.getIndexesUrl() + index + '?' }
+Database.prototype.getDocsUrl = function() { return this.getUrl() + '/docs' }
+Database.prototype.getDocUrl = function(id) { return this.getDocsUrl() + '/' + id }
+Database.prototype.getIndexesUrl = function() { return this.getUrl() + '/indexes' }
+Database.prototype.getIndexUrl = function(index) { return this.getIndexesUrl() + '/' + index }
 Database.prototype.getTermsUrl = function(index, field) { 
   return this.getUrl() + '/terms/' + index + '?field=' + field
 }
@@ -41,7 +41,8 @@ Database.prototype.saveDocument = function(collection, doc, cb) {
 
   if (doc.id) {
     op = request.put
-    url += doc.id
+    url = this.getDocUrl(doc.id)
+    delete doc.id // Don't add this as it's own property to the document...
   }
 
 	op({ 
@@ -106,8 +107,7 @@ Database.prototype.getDocumentCount = function(collection, cb) {
 
 
 Database.prototype.dynamicQuery = function(doc, start, count, cb) {
-  console.log(doc)
-  var url = this.getIndexUrl(Database.DYNAMIC_INDEX) + 'start=' + start + '&pageSize=' + count + '&aggregation=None&query='
+  var url = this.getIndexUrl(Database.DYNAMIC_INDEX) + '?start=' + start + '&pageSize=' + count + '&aggregation=None&query='
   for (prop in doc) {
     url += prop + ':' + doc[prop] + '+'
   }
@@ -120,7 +120,7 @@ Database.prototype.queryRavenDocumentsByEntityName = function(name, start, count
   // if start and count aren't passed in, you'll just get the TotalResults property
   // and no results
 
-  var url = this.getIndexUrl(Database.DOCUMENTS_BY_ENTITY_NAME_INDEX) + 'start=' + start + '&pageSize=' + count + '&aggregation=None'
+  var url = this.getIndexUrl(Database.DOCUMENTS_BY_ENTITY_NAME_INDEX) + '?start=' + start + '&pageSize=' + count + '&aggregation=None'
   if (name && name.length > 0) url += '&query=Tag:' + name
   this.apiGetCall(url, cb)
 }

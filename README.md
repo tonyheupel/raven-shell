@@ -85,14 +85,7 @@ undefined
 > .read users/mamma
 { id: 'users/mamma',
   firstName: 'Mamma',
-  lastName: 'Jenkins',
-  '@metadata':
-   { 'Raven-Entity-Name': 'Users',
-     '@id': 'users/mamma',
-     'Temp-Index-Score': 1.4054651260375977,
-     'Last-Modified': '2012-05-12T23:43:01.8700000',
-     '@etag': '00000000-0000-0900-0000-000000000002',
-     'Non-Authoritative-Information': false } } ]
+  lastName: 'Jenkins' }
 > .delete users/mamma
 > .read users/mamma
 [Error: Error: 404 - ]
