@@ -23,6 +23,30 @@ r.defineCommand('store', {
   }
 })
 
+
+r.defineCommand('stats', {
+  help: 'Show statistics for the current database',
+  action: function() {
+    try {
+      r.context.db.getStats(function(error, stats) {
+        if (error) {
+          console.error(error)
+          r.displayPrompt()
+          return
+        }
+
+        console.log(stats)
+        r.context._ = stats
+        r.displayPrompt()
+      })
+    } catch (e) {
+      console.error(e)
+      r.displayPrompt()
+    }
+  }
+})
+
+
 r.defineCommand('collections', {
   help: 'Show all collections in the current database',
   action: function() {
