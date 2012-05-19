@@ -182,4 +182,62 @@ r.defineCommand('count', {
   }
 })
 
+
+r.defineCommand('createIndex', {
+  help: "Create an index with a name, map, and optional reduce: .create-index foobar { map: 'from doc in docs.Albums\rwhere doc.Genre != null\rselect new { Genre = doc.Genre.Id }'}",
+  action: function(args) {
+    try {
+      var name, index = null
+      var match = /^(\w+)\s+(.*)$/.exec(args)
+
+      if (match.length != 3) {
+        console.error('Unable to craete index: wrong number of arguments.  Type ".help" to see usage')
+        return
+      }
+
+      name = match[1]
+      index = match[2]
+
+      eval ('var createIndexIndex = ' + index )
+
+      r.context.db.createIndex(name, 
+                               createIndexIndex['map'], 
+                               createIndexIndex['reduce'], 
+                               function(error, result) {
+        if (error) console.error(error)
+
+        if (result) console.log(result)
+        r.context._ = result
+        r.displayPrompt()
+      })
+    } catch(e) {
+      console.error(e)
+      r.displayPrompt()
+    }
+  }
+})
+
+
+r.defineCommand('deleteIndex', {
+  help: 'Delete an given its name (e.g., .delete AlbumsByGenre)',
+  action: function(args) {
+    try {
+      if (!args) throw Error('Wrong number of arguments; see .help for more information')
+
+      var name = args
+      r.context.db.deleteIndex(name, function(error, result) {
+        if (error) console.error(error)
+        
+        if (result) console.log(result)
+        r.context._ = result
+        r.displayPrompt()
+      })
+      
+    } catch (e) {
+      console.error(e)
+      r.displayPrompt()
+    }
+  }
+})
+
 useStore('http://localhost:8080')
