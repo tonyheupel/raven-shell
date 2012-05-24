@@ -266,22 +266,22 @@ var defineCommands = function(r) {
   })
 }
 
-var startInteractiveREPL = function() {
+var startInteractiveREPL = function(store) {
   console.log('RavenDB shell')
 
   var r = repl.start("> ")
   defineCommands(r)
-  useStore(r, 'http://localhost:8080')
+  useStore(r, store)
 
   return r
 }
 
 
-var startEvalREPL = function(string) {
+var startEvalREPL = function(store, string) {
   var r = repl.start("> ")
   defineCommands(r)
 
-  useStore(r, 'http://localhost:8080')
+  useStore(r, store)
 
   var lines = string.split('\n')
 
@@ -294,36 +294,71 @@ var startEvalREPL = function(string) {
   return r
 }
 
-var startFileREPL = function(filename) {
+var startFileREPL = function(store, filename) {
   // TODO: Copy the .load command code or just call .load
   var r = repl.start("> ")
   defineCommands(r)
 
-  useStore(r, 'http://localhost:8080')
+  useStore(r, store)
 
   r.rli.write('.load ' + filename + '\n')
 
   return r
 }
 
+var ArgumentParser = require('argparse').ArgumentParser;
+var parser = new ArgumentParser({
+  version: '0.0.1',
+  addHelp:true,
+  description: 'RavenDB command line shell'
+});
+parser.addArgument(
+  [ '-f', '--file' ],
+  {
+    help: 'load and execute a file of shell commands',
+    dest: 'file'
+  }
+)
+parser.addArgument(
+  [ '-e', '--eval' ],
+  {
+    help: 'evaluate a single string of shell commands',
+    dest: 'eval'
+  }
+)
+parser.addArgument(
+  [ '-s', '--store' ],
+  {
+    help: 'specify which data store to use (defaults to http://localhost:8080 if not specfied)',
+    defaultValue: 'http://localhost:8080',
+    dest: 'store'
+  }
+)
+parser.addArgument(
+  [ '--keep-open' ],
+  {
+    help: 'keep the shell open when the passed in file or eval is done executing',
+    action: 'storeTrue',
+    defaultValue: false,
+    dest: 'keep-open'
+  }
+)
+var args = parser.parseArgs();
 
 var shell
-var keepOpen = false
+var keepOpen = args['keep-open'] || false
+var evalString = args['eval']
+var file = args['file']
+var store = args['store']
 
-for (var i = 0; i < process.argv.length; i++) {
-  var arg = process.argv[i]
-
-  if (arg === '-e' || arg === '--eval') {
-    shell = startEvalREPL(process.argv[++i])
-  } else if (arg === '-f' || arg === '--file') {
-    shell = startFileREPL(process.argv[++i])
-  } else if (arg === '--keep-open') {
-    keepOpen = true
-  }
+if (evalString) {
+    shell = startEvalREPL(store, evalString)
+} else if (file) {
+    shell = startFileREPL(store, file)
 }
 
 if (!shell) {
-  shell = startInteractiveREPL()
+  shell = startInteractiveREPL(store)
 } else {
   if (!keepOpen) {
     shell.rli.close()
