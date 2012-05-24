@@ -2,11 +2,18 @@
 
 var repl = require('repl')
   , ravendb = require('ravendb')
+  , fs = require('fs')
+  , ArgumentParser = require('argparse').ArgumentParser
+
+
+var version = JSON.parse(fs.readFileSync('./package.json')).version
+
 
 var useStore = function(r, url) {
   r.context.store = ravendb.use(url)
   r.context.db = r.context.store.defaultDb
 }
+
 
 var defineCommands = function(r) {
   r.defineCommand('store', {
@@ -266,26 +273,25 @@ var defineCommands = function(r) {
   })
 }
 
-var startInteractiveREPL = function(store) {
-  console.log('RavenDB shell')
+var startREPL = function(store) {
+  console.log('RavenDB shell version ' + version)
 
   var r = repl.start("> ")
   defineCommands(r)
   useStore(r, store)
-
+  r.version = version
   return r
+}
+var startInteractiveREPL = function(store) {
+  return startREPL(store, version)
 }
 
 
 var startEvalREPL = function(store, string) {
-  var r = repl.start("> ")
-  defineCommands(r)
-
-  useStore(r, store)
+  var r = startREPL(store, version)
 
   var lines = string.split('\n')
 
-  r.displayPrompt()
   lines.forEach(function(line) {
     if (line) {
       r.rli.write(line + '\n')
@@ -295,21 +301,15 @@ var startEvalREPL = function(store, string) {
 }
 
 var startFileREPL = function(store, filename) {
-  // TODO: Copy the .load command code or just call .load
-  var r = repl.start("> ")
-  defineCommands(r)
-
-  useStore(r, store)
-
+  var r = startREPL(store)
   r.rli.write('.load ' + filename + '\n')
-
   return r
 }
 
-var ArgumentParser = require('argparse').ArgumentParser;
+
 var parser = new ArgumentParser({
-  version: '0.0.1',
-  addHelp:true,
+  version: version,
+  addHelp: true,
   description: 'RavenDB command line shell'
 });
 parser.addArgument(
