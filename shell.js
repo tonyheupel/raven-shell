@@ -2,11 +2,7 @@
 
 var repl = require('repl')
   , ravendb = require('ravendb')
-  , fs = require('fs')
   , ArgumentParser = require('argparse').ArgumentParser
-
-
-var version = JSON.parse(fs.readFileSync('./package.json')).version
 
 
 var useStore = function(r, url) {
@@ -274,21 +270,20 @@ var defineCommands = function(r) {
 }
 
 var startREPL = function(store) {
-  console.log('RavenDB shell version ' + version)
+  console.log('RavenDB shell')
 
   var r = repl.start("> ")
   defineCommands(r)
   useStore(r, store)
-  r.version = version
   return r
 }
 var startInteractiveREPL = function(store) {
-  return startREPL(store, version)
+  return startREPL(store)
 }
 
 
 var startEvalREPL = function(store, string) {
-  var r = startREPL(store, version)
+  var r = startREPL(store)
 
   var lines = string.split('\n')
 
@@ -300,7 +295,7 @@ var startEvalREPL = function(store, string) {
   return r
 }
 
-var startFileREPL = function(store, filename) {
+var startFileREPL = function(store) {
   var r = startREPL(store)
   r.rli.write('.load ' + filename + '\n')
   return r
@@ -308,7 +303,6 @@ var startFileREPL = function(store, filename) {
 
 
 var parser = new ArgumentParser({
-  version: version,
   addHelp: true,
   description: 'RavenDB command line shell'
 });
@@ -340,16 +334,16 @@ parser.addArgument(
     help: 'keep the shell open when the passed in file or eval is done executing',
     action: 'storeTrue',
     defaultValue: false,
-    dest: 'keep-open'
+    dest: 'keepOpen'
   }
 )
 var args = parser.parseArgs();
 
 var shell
-var keepOpen = args['keep-open']
-var evalString = args['eval']
-var file = args['file']
-var store = args['store']
+var keepOpen = args.keepOpen
+var evalString = args.eval
+var file = args.file
+var store = args.store
 
 if (evalString) {
     shell = startEvalREPL(store, evalString)
