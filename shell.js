@@ -335,7 +335,7 @@ parser.addArgument(
   }
 )
 parser.addArgument(
-  [ '--keep-open' ],
+  [ '-ko', '--keep-open' ],
   {
     help: 'keep the shell open when the passed in file or eval is done executing',
     action: 'storeTrue',
@@ -346,7 +346,7 @@ parser.addArgument(
 var args = parser.parseArgs();
 
 var shell
-var keepOpen = args['keep-open'] || false
+var keepOpen = args['keep-open']
 var evalString = args['eval']
 var file = args['file']
 var store = args['store']
