@@ -295,7 +295,7 @@ var startEvalREPL = function(store, string) {
   return r
 }
 
-var startFileREPL = function(store) {
+var startFileREPL = function(store, filename) {
   var r = startREPL(store)
   r.rli.write('.load ' + filename + '\n')
   return r
