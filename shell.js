@@ -303,6 +303,7 @@ var startFileREPL = function(store, filename) {
 
 
 var parser = new ArgumentParser({
+  version: '0.0.3',
   addHelp: true,
   description: 'RavenDB command line shell'
 });
@@ -358,4 +359,3 @@ if (!shell) {
     shell.rli.close()
   }
 }
-
