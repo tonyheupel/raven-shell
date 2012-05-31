@@ -5,20 +5,41 @@ var repl = require('repl')
   , ArgumentParser = require('argparse').ArgumentParser
 
 
-var useStore = function(r, url) {
-  r.context.store = ravendb.use(url)
-  r.context.db = r.context.store.defaultDb
+var createDatastore = function(r, url, databaseName) {
+  r.context.db = ravendb(url, databaseName)
+  r.context.store = r.context.db.datastore
 }
 
+var useDatabase = function(r, databaseName) {
+  if (!r.context.store) throw new Error('The datastore must first be set')
+
+  r.context.db = ravendb(r.context.store.url, databaseName)
+}
+
+var currentDatabaseString = function(r) {
+  return 'Using database "' + r.context.db.name + '" in datastore at: "' + r.context.store.url + '"'
+}
 
 var defineCommands = function(r) {
   r.defineCommand('store', {
     help: 'Use the RavenDB datastore at a url ".store <url>"',
     action: function(url) {
-      if (!url) url = r.context.db.getUrl()
+      if (!url) url = r.context.store.url
       else useStore(r, url)
 
-      console.log('Using datastore at: ' + url)
+      console.log(currentDatabaseString(r))
+      r.displayPrompt()
+    }
+  })
+
+
+ r.defineCommand('use', {
+    help: 'Use the database with the given name ".use <database-name>"',
+    action: function(name) {
+      if (!name) name = r.context.db.name
+      else useDatabase(r, name)
+
+      console.log(currentDatabaseString(r))
       r.displayPrompt()
     }
   })
@@ -269,21 +290,23 @@ var defineCommands = function(r) {
   })
 }
 
-var startREPL = function(store) {
+var startREPL = function(store, databaseName) {
   console.log('RavenDB shell')
 
   var r = repl.start("> ")
   defineCommands(r)
-  useStore(r, store)
+  createDatastore(r, store, databaseName)
+
+  r.rli.write('.use\n')
   return r
 }
-var startInteractiveREPL = function(store) {
+var startInteractiveREPL = function(store, databaseName) {
   return startREPL(store)
 }
 
 
-var startEvalREPL = function(store, string) {
-  var r = startREPL(store)
+var startEvalREPL = function(string, store, databaseName) {
+  var r = startREPL(store, databaseName)
 
   var lines = string.split('\n')
 
@@ -295,8 +318,8 @@ var startEvalREPL = function(store, string) {
   return r
 }
 
-var startFileREPL = function(store, filename) {
-  var r = startREPL(store)
+var startFileREPL = function(filename, store, databaseName) {
+  var r = startREPL(store, databaseName)
   r.rli.write('.load ' + filename + '\n')
   return r
 }
@@ -330,6 +353,14 @@ parser.addArgument(
   }
 )
 parser.addArgument(
+  [ '-db', '--database'],
+  {
+    help: 'specify which database to use (defaults to "Default" if not specified)',
+    defaultValue: 'Default',
+    dest: 'database'
+  }
+)
+parser.addArgument(
   [ '-ko', '--keep-open' ],
   {
     help: 'keep the shell open when the passed in file or eval is done executing',
@@ -345,15 +376,16 @@ var keepOpen = args.keepOpen
 var evalString = args.eval
 var file = args.file
 var store = args.store
+var database = args.database
 
 if (evalString) {
-    shell = startEvalREPL(store, evalString)
+    shell = startEvalREPL(evalString, store, database)
 } else if (file) {
-    shell = startFileREPL(store, file)
+    shell = startFileREPL(file, store, database)
 }
 
 if (!shell) {
-  shell = startInteractiveREPL(store)
+  shell = startInteractiveREPL(store, database)
 } else {
   if (!keepOpen) {
     shell.rli.close()
