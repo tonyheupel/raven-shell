@@ -4,6 +4,7 @@ var repl = require('repl')
   , ravendb = require('ravendb')
   , ArgumentParser = require('argparse').ArgumentParser
 
+var version = '0.0.5'  // Keep in sync with package.json
 
 var createDatastore = function(r, url, databaseName) {
   r.context.db = ravendb(url, databaseName)
@@ -291,17 +292,18 @@ var defineCommands = function(r) {
 }
 
 var startREPL = function(store, databaseName) {
-  console.log('RavenDB shell')
+  console.log('RavenDB shell version ' + version)
 
   var r = repl.start("> ")
-  defineCommands(r)
   createDatastore(r, store, databaseName)
+  defineCommands(r)
 
-  r.rli.write('.use\n')
+  console.log(currentDatabaseString(r))
+  r.displayPrompt()
   return r
 }
 var startInteractiveREPL = function(store, databaseName) {
-  return startREPL(store)
+  return startREPL(store, databaseName)
 }
 
 
@@ -326,7 +328,7 @@ var startFileREPL = function(filename, store, databaseName) {
 
 
 var parser = new ArgumentParser({
-  version: '0.0.3',
+  'version': version,
   addHelp: true,
   description: 'RavenDB command line shell'
 });
