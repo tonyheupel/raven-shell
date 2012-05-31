@@ -26,7 +26,7 @@ var defineCommands = function(r) {
     help: 'Use the RavenDB datastore at a url ".store <url>"',
     action: function(url) {
       if (!url) url = r.context.store.url
-      else useStore(r, url)
+      else createDatastore(r, url, r.context.db.name) // TODO: IS THIS A GOOD IDEA, TO USE THE SAME DB NAME?
 
       console.log(currentDatabaseString(r))
       r.displayPrompt()
