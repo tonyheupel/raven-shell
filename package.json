@@ -24,7 +24,7 @@
     "ravendb"  
 	],
   "dependencies" : {
-	"ravendb": ">=0.0.3",
+	"ravendb": ">=0.0.4",
   "argparse": ">=0.1.1"
   },
   "noAnalyze": true,
