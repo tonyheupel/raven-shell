@@ -4,7 +4,7 @@ var repl = require('repl')
   , ravendb = require('ravendb')
   , ArgumentParser = require('argparse').ArgumentParser
 
-var version = '0.0.5'  // Keep in sync with package.json
+var version = '0.0.7'  // Keep in sync with package.json
 
 var createDatastore = function(r, url, databaseName) {
   r.context.db = ravendb(url, databaseName)
@@ -289,6 +289,53 @@ var defineCommands = function(r) {
       }
     }
   })
+
+
+    r.defineCommand('createDatabase', {
+    help: 'Create a database tenant (e.g., .createDatabase Foobar)',
+    action: function(args) {
+      try {
+        if (!args) throw Error('Wrong number of arguments; see .help for more information')
+
+        var name = args
+        r.context.store.createDatabase(name, function(error, result) {
+          if (error) console.error(error)
+
+          if (result) console.log(result)
+          r.context._ = result
+          r.displayPrompt()
+        })
+
+      } catch (e) {
+        console.error(e)
+        r.displayPrompt()
+      }
+    }
+  })
+
+
+  r.defineCommand('deleteDatabase', {
+    help: 'Delete a database given its name (e.g., .deleteDatabase Foobar)',
+    action: function(args) {
+      try {
+        if (!args) throw Error('Wrong number of arguments; see .help for more information')
+
+        var name = args
+        r.context.store.deleteDatabase(name, function(error, result) {
+          if (error) console.error(error)
+
+          if (result) console.log(result)
+          r.context._ = result
+          r.displayPrompt()
+        })
+
+      } catch (e) {
+        console.error(e)
+        r.displayPrompt()
+      }
+    }
+  })
+
 }
 
 var startREPL = function(store, databaseName) {
