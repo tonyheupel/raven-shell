@@ -169,7 +169,7 @@ var defineCommands = function(r) {
 
 
   r.defineCommand('find', {
-    help: 'Find documents ".find <JSON object> [start count]" (e.g., .find { firstName: "Tony" } 20 100)',
+    help: 'Find documents ".find <JSON object> [start [count]]" (e.g., .find { firstName: "Tony" } 20 100)',
     action: function(args) {
       try {
         if (!args) throw Error('Wrong number of arguments; see .help for .find usage')
@@ -209,11 +209,30 @@ var defineCommands = function(r) {
     help: 'Retrieve documents in a collection (e.g., .doc Users)',
     action: function(args) {
       try {
-        var match = /(\w+)/.exec(args)
+        // Parse args: [collection [start [count]]]
+        // .count Users 50 100
+        //        ^-1-^^--2--^
+        //               3  5
+        //                ^4-^
+        // match[0] = "Users 50 100"
+        // match[1] = "Users"
+        // match[2] = " 50 100"
+        // match[3] = "50"
+        // match[4] = " 100"
+        // match[5] = "100"
+        
+        var match = /(\w+)(\s+(\d+)(\s+(\d+))?)?/.exec(args)
 
-        var collection = (match && match.length == 2) ? match[1] : null
+        var collection = start = count = null
+        
+        if (match) {
+          collection = match[1]
+          start = match[3] ? parseInt(match[3]) : null
+          count = match[5] ? parseInt(match[5]) : null  
+        }
+        
 
-        r.context.db.getDocsInCollection(collection, function(error, result) {
+        r.context.db.getDocsInCollection(collection, start, count, function(error, result) {
           if (error) console.error(error)
 
           if (result) console.log(result)
