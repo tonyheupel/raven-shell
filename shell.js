@@ -169,14 +169,28 @@ var defineCommands = function(r) {
 
 
   r.defineCommand('find', {
-    help: 'Find documents (e.g., .find { firstName: "Tony" })',
+    help: 'Find documents ".find <JSON object> [start count]" (e.g., .find { firstName: "Tony" } 20 100)',
     action: function(args) {
       try {
         if (!args) throw Error('Wrong number of arguments; see .help for .find usage')
 
-        eval('var argsDoc = ' + args)
+        // Parse args: { attr: value } [start [count]]
+        // .find { some: 'thing'} 20 100
+        //       ^-------1------^^--2--^
+        //                         3  5
+        //                          ^4-^
+        // match[0] = "{ some: 'thing'} 20 100"
+        // match[1] = "{ some: 'thing'}"
+        // match[2] = " 20 100"
+        // match[3] = "20"
+        // match[4] = " 100"
+        // match[5] = "100"
+        var match = /(\{.*\})(\s+(\d+)(\s+(\d+))?)?/.exec(args)
+        eval('var doc = ' + match[1])        
+        var start = match[3] ? parseInt(match[3]) : null
+        var count = match[5] ? parseInt(match[5]) : null
 
-        r.context.db.find(argsDoc, function(error, result) {
+        r.context.db.find(doc, start, count, function(error, result) {
           if (error) console.error(error)
 
           if (result) console.log(result)
