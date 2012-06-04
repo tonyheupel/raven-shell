@@ -4,7 +4,7 @@ var repl = require('repl')
   , ravendb = require('ravendb')
   , ArgumentParser = require('argparse').ArgumentParser
 
-var version = '0.0.7'  // Keep in sync with package.json
+var version = '0.0.8'  // Keep in sync with package.json
 
 var createDatastore = function(r, url, databaseName) {
   r.context.db = ravendb(url, databaseName)
