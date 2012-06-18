@@ -186,7 +186,7 @@ var defineCommands = function(r) {
         // match[4] = " 100"
         // match[5] = "100"
         var match = /(\{.*\})(\s+(\d+)(\s+(\d+))?)?/.exec(args)
-        eval('var doc = ' + match[1])        
+        eval('var doc = ' + match[1])
         var start = match[3] ? parseInt(match[3]) : null
         var count = match[5] ? parseInt(match[5]) : null
 
@@ -220,17 +220,17 @@ var defineCommands = function(r) {
         // match[3] = "50"
         // match[4] = " 100"
         // match[5] = "100"
-        
+
         var match = /(\w+)(\s+(\d+)(\s+(\d+))?)?/.exec(args)
 
         var collection = start = count = null
-        
+
         if (match) {
           collection = match[1]
           start = match[3] ? parseInt(match[3]) : null
-          count = match[5] ? parseInt(match[5]) : null  
+          count = match[5] ? parseInt(match[5]) : null
         }
-        
+
 
         r.context.db.getDocsInCollection(collection, start, count, function(error, result) {
           if (error) console.error(error)
