@@ -9,7 +9,7 @@
 
   ArgumentParser = require('argparse').ArgumentParser;
 
-  version = '0.0.8';
+  version = '0.0.10';
 
   createDatastore = function(r, url, databaseName) {
     r.context.db = ravendb(url, databaseName);

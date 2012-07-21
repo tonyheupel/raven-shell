@@ -4,7 +4,7 @@ repl = require('repl')
 ravendb = require('ravendb')
 ArgumentParser = require('argparse').ArgumentParser
 
-version = '0.0.8'  # Keep in sync with package.json
+version = '0.0.10'  # Keep in sync with package.json
 
 createDatastore = (r, url, databaseName) ->
   r.context.db = ravendb(url, databaseName)
