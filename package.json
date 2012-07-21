@@ -9,7 +9,7 @@
     } 
   ],
   "bin": {
-    "raven": "./lib/shell.js"
+    "raven": "./raven-shell.js"
   },
   "scripts": {
     "start": "raven",
