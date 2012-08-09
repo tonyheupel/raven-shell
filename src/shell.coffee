@@ -224,7 +224,8 @@ defineCommands = (r) ->
     help: 'Show the count of documents in a collection or in the database if left blank (e.g., .count Users)'
     action: (args) ->
       try
-        r.context.db.getDocumentCount args, (error, result) ->
+        collection = args || null
+        r.context.db.getDocumentCount collection, (error, result) ->
           console.error error if error?
 
           console.log result if result?
