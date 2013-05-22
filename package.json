@@ -1,7 +1,7 @@
 {
   "name": "raven-shell",
   "preferGlobal": "true",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "author": "Tony Heupel <tonyheupel@gmail.com>",
   "description": "A command-line interface to RavenDB",
   "contributors": [ 
@@ -25,7 +25,7 @@
     "ravendb"
 	],
   "dependencies" : {
-	  "ravendb": ">=0.0.15",
+	  "ravendb": ">=0.0.25",
     "argparse": ">=0.1.1"
   },
   "noAnalyze": true,

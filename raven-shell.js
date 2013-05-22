@@ -178,6 +178,36 @@
         }
       }
     });
+    r.defineCommand('deleteDocsByIndex', {
+      help: 'Delete a set of documents using an index/query (e.g., .deleteDocumentsByIndex DocsByCollectionName MyCollection)',
+      action: function(args) {
+        var id;
+        try {
+          if (args == null) {
+            throw Error('Wrong number of arguments; see .help for more information');
+          }
+          args = args.split(' ');
+          if (args.length < 1) {
+            throw Error('Wrong number of arguments; see .help for more information');
+          }
+          index = args[0];
+          query = args.length > 1 ? args[1] : null;
+          return r.context.db.deleteDocuments(index, query, function(error, result) {
+            if (error != null) {
+              console.error(error);
+            }
+            if (result != null) {
+              console.log(result);
+            }
+            r.context._ = result;
+            return r.displayPrompt();
+          });
+        } catch (e) {
+          console.error(e);
+          return r.displayPrompt();
+        }
+      }
+    });
     r.defineCommand('find', {
       help: 'Find documents ".find <JSON object> [start [count]]" (e.g., .find { firstName: "Tony" } 20 100)',
       action: function(args) {
